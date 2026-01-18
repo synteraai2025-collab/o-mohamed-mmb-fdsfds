@@ -1,4 +1,7 @@
 import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
@@ -33,6 +36,21 @@ export default function Home() {
             {/* Refined spinner */}
             <div className="flex items-center justify-center space-x-3">
               <div className="w-8 h-8 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          </div>
+
+          {/* Navigation to Habit Tracker */}
+          <div className="pt-8 border-t border-slate-200">
+            <div className="space-y-4">
+              <p className="text-sm text-slate-600">
+                Or explore what we've built:
+              </p>
+              <Link href="/habits" className="inline-block">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  View Habit Tracker
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
