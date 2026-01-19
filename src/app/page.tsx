@@ -1,41 +1,25 @@
-import Image from "next/image";
+import { HabitTracker } from '@/components/HabitTracker';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50/30 flex items-center justify-center px-6">
-      <div className="text-center max-w-md w-full">
-        {/* Logo with subtle elegance */}
-        <div className="mb-8">
-          <div className="relative inline-block">
-            {/* Logo container with refined shadow */}
-            <div className="w-20 h-20 flex items-center justify-center mx-auto">
-              <Image 
-                src="/images/syntera-logo.svg" 
-                alt="Syntera" 
-                width={64}
-                height={64}
-                className="transition-transform duration-300 hover:scale-110"
-              />
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <header className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-foreground mb-2">
+            Habit Tracker
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Build better habits, one day at a time
+          </p>
+        </header>
         
-        {/* Clean loading state */}
-        <div className="space-y-8">
-          {/* Main loading indicator */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-center space-x-3">
-              <p className="text-xl text-slate-700 font-medium">
-                AI agent is designing your website...
-              </p>
-            </div>
-
-            {/* Refined spinner */}
-            <div className="flex items-center justify-center space-x-3">
-              <div className="w-8 h-8 border-4 border-solid border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          </div>
-        </div>
+        <main className="space-y-8">
+          <HabitTracker />
+        </main>
+        
+        <footer className="text-center mt-16 text-sm text-muted-foreground">
+          <p>Track your daily habits and build lasting routines</p>
+        </footer>
       </div>
     </div>
   );
