@@ -1,0 +1,311 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?
+  firstName     String
+  lastName      String
+  role          String    @default("EMPLOYEE")
+  isActive      Boolean   @default(true)
+  employeeId    String?   @unique
+  profileImage  String?
+  language      String    @default("en")
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  employee      Employee?
+  
+  @@map("users")
+}
+
+model Employee {
+  id              String           @id @default(cuid())
+  employeeId      String           @unique
+  firstName       String
+  lastName        String
+  email           String           @unique
+  phone           String?
+  dateOfBirth     DateTime?
+  hireDate        DateTime
+  terminationDate DateTime?
+  departmentId    String
+  positionId      String
+  managerId       String?
+  salary          Decimal
+  currency        String           @default("USD")
+  employmentType  String
+  status          String           @default("ACTIVE")
+  nationality     String?
+  gender          String?
+  maritalStatus   String?
+  profileImage    String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  department      Department       @relation(fields: [departmentId], references: [id])
+  position        Position         @relation(fields: [positionId], references: [id])
+  manager         Employee?        @relation("EmployeeManager", fields: [managerId], references: [id])
+  subordinates    Employee[]       @relation("EmployeeManager")
+  user            User?
+  leaves          Leave[]
+  payrolls        Payroll[]
+  managedDepartments Department[] @relation("DepartmentManager")
+  
+  @@map("employees")
+}
+
+model Department {
+  id            String       @id @default(cuid())
+  name          String
+  nameAr        String?
+  code          String       @unique
+  description   String?
+  descriptionAr String?
+  managerId     String?
+  parentId      String?
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  manager       Employee?    @relation("DepartmentManager", fields: [managerId], references: [id])
+  parent        Department?  @relation("DepartmentHierarchy", fields: [parentId], references: [id])
+  children      Department[] @relation("DepartmentHierarchy")
+  employees     Employee[]
+  positions     Position[]
+  
+  @@map("departments")
+}
+
+model Position {
+  id            String       @id @default(cuid())
+  title         String
+  titleAr       String?
+  code          String       @unique
+  description   String?
+  descriptionAr String?
+  departmentId  String
+  level         String
+  minSalary     Decimal?
+  maxSalary     Decimal?
+  currency      String?
+  isActive      Boolean      @default(true)
+  reportsToId   String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  department    Department   @relation(fields: [departmentId], references: [id])
+  reportsTo     Position?    @relation("PositionHierarchy", fields: [reportsToId], references: [id])
+  subordinates  Position[]   @relation("PositionHierarchy")
+  employees     Employee[]
+  
+  @@map("positions")
+}
+
+model Leave {
+  id            String      @id @default(cuid())
+  employeeId    String
+  leaveTypeId   String
+  startDate     DateTime
+  endDate       DateTime
+  days          Int
+  reason        String?
+  status        String      @default("PENDING")
+  requestedAt   DateTime    @default(now())
+  approvedAt    DateTime?
+  approvedBy    String?
+  approverNotes String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  employee      Employee    @relation(fields: [employeeId], references: [id])
+  leaveType     LeaveType   @relation(fields: [leaveTypeId], references: [id])
+  approver      User?       @relation(fields: [approvedBy], references: [id])
+  
+  @@map("leaves")
+}
+
+model LeaveType {
+  id                  String     @id @default(cuid())
+  name                String
+  nameAr              String?
+  code                String     @unique
+  description         String?
+  descriptionAr       String?
+  maxDaysPerYear      Int
+  isPaid              Boolean
+  requiresApproval    Boolean    @default(true)
+  isActive            Boolean    @default(true)
+  carryForwardAllowed Boolean    @default(false)
+  carryForwardMaxDays Int?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  
+  leaves              Leave[]
+  leaveBalances       LeaveBalance[]
+  
+  @@map("leave_types")
+}
+
+model LeaveBalance {
+  id               String     @id @default(cuid())
+  employeeId       String
+  leaveTypeId      String
+  year             Int
+  allocatedDays    Int
+  usedDays         Int        @default(0)
+  remainingDays    Int
+  carryForwardDays Int        @default(0)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  
+  employee         Employee   @relation(fields: [employeeId], references: [id])
+  leaveType        LeaveType  @relation(fields: [leaveTypeId], references: [id])
+  
+  @@unique([employeeId, leaveTypeId, year])
+  @@map("leave_balances")
+}
+
+model Payroll {
+  id              String             @id @default(cuid())
+  employeeId      String
+  payPeriodStart  DateTime
+  payPeriodEnd    DateTime
+  payDate         DateTime
+  basicSalary     Decimal
+  grossPay        Decimal
+  totalDeductions Decimal
+  netPay          Decimal
+  currency        String             @default("USD")
+  status          String             @default("DRAFT")
+  processedAt     DateTime?
+  processedBy     String?
+  notes           String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  employee        Employee           @relation(fields: [employeeId], references: [id])
+  processor       User?              @relation(fields: [processedBy], references: [id])
+  allowances      PayrollAllowance[]
+  deductions      PayrollDeduction[]
+  bonuses         PayrollBonus[]
+  
+  @@map("payrolls")
+}
+
+model PayrollAllowance {
+  id              String    @id @default(cuid())
+  payrollId       String
+  allowanceTypeId String
+  amount          Decimal
+  isTaxable       Boolean   @default(true)
+  description     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  payroll         Payroll   @relation(fields: [payrollId], references: [id])
+  allowanceType   AllowanceType @relation(fields: [allowanceTypeId], references: [id])
+  
+  @@map("payroll_allowances")
+}
+
+model PayrollDeduction {
+  id                String       @id @default(cuid())
+  payrollId         String
+  deductionTypeId   String
+  amount            Decimal
+  isTaxDeductible   Boolean      @default(true)
+  description       String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  
+  payroll           Payroll      @relation(fields: [payrollId], references: [id])
+  deductionType     DeductionType @relation(fields: [deductionTypeId], references: [id])
+  
+  @@map("payroll_deductions")
+}
+
+model PayrollBonus {
+  id            String     @id @default(cuid())
+  payrollId     String
+  bonusTypeId   String
+  amount        Decimal
+  isTaxable     Boolean    @default(true)
+  description   String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  
+  payroll       Payroll    @relation(fields: [payrollId], references: [id])
+  bonusType     BonusType  @relation(fields: [bonusTypeId], references: [id])
+  
+  @@map("payroll_bonuses")
+}
+
+model AllowanceType {
+  id              String                @id @default(cuid())
+  name            String
+  nameAr          String?
+  code            String                @unique
+  description     String?
+  descriptionAr   String?
+  isTaxable       Boolean               @default(true)
+  isActive        Boolean               @default(true)
+  defaultAmount   Decimal?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  
+  payrollAllowances PayrollAllowance[]
+  
+  @@map("allowance_types")
+}
+
+model DeductionType {
+  id                  String                @id @default(cuid())
+  name                String
+  nameAr              String?
+  code                String                @unique
+  description         String?
+  descriptionAr       String?
+  isTaxDeductible     Boolean               @default(true)
+  isMandatory         Boolean               @default(false)
+  isActive            Boolean               @default(true)
+  defaultAmount       Decimal?
+  percentageOfSalary  Decimal?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  
+  payrollDeductions   PayrollDeduction[]
+  
+  @@map("deduction_types")
+}
+
+model BonusType {
+  id                  String          @id @default(cuid())
+  name                String
+  nameAr              String?
+  code                String          @unique
+  description         String?
+  descriptionAr       String?
+  isTaxable           Boolean         @default(true)
+  isActive            Boolean         @default(true)
+  defaultAmount       Decimal?
+  percentageOfSalary  Decimal?
+  frequency           String          @default("MONTHLY")
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  
+  payrollBonuses      PayrollBonus[]
+  
+  @@map("bonus_types")
+}

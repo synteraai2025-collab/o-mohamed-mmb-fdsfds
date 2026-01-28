@@ -31,53 +31,44 @@ export async function GET(
       );
     }
 
-    const user = await prisma.user.findUnique({
+    const employee = await prisma.employee.findUnique({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        isActive: true,
-        employeeId: true,
-        profileImage: true,
-        language: true,
-        lastLoginAt: true,
-        createdAt: true,
-        updatedAt: true,
-        employee: {
+      include: {
+        department: {
           select: {
-            employeeId: true,
-            phone: true,
-            hireDate: true,
-            department: {
-              select: {
-                name: true,
-                nameAr: true,
-              }
-            },
-            position: {
-              select: {
-                title: true,
-                titleAr: true,
-              }
-            }
+            id: true,
+            name: true,
+            nameAr: true,
+          }
+        },
+        position: {
+          select: {
+            id: true,
+            title: true,
+            titleAr: true,
+          }
+        },
+        manager: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
           }
         }
       }
     });
 
-    if (!user) {
+    if (!employee) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: 'Employee not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json(employee);
   } catch (error) {
-    console.error('Error fetching user:', error);
+    console.error('Error fetching employee:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
