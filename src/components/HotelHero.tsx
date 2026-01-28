@@ -23,7 +23,7 @@ export function HotelHero({
   className
 }: HotelHeroProps) {
   return (
-    <section className={cn("relative h-[600px] md:h-[700px] lg:h-[800px] overflow-hidden", className)}>
+    <section className={cn("relative h-[500px] sm:h-[600px] md:h-[700px] lg:h-[800px] xl:h-[850px] overflow-hidden", className)}>
       {/* Background Image */}
       <div 
         className="absolute inset-0 z-0"
@@ -36,21 +36,21 @@ export function HotelHero({
       />
       
       {/* Content */}
-      <div className="relative z-10 h-full flex items-center justify-center">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative z-10 h-full flex items-center justify-center px-4">
+        <div className="container mx-auto text-center">
           <div className="max-w-4xl mx-auto">
             {/* Subtitle */}
-            <p className="text-lg md:text-xl lg:text-2xl text-white/90 font-medium mb-4 animate-fade-in-up">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 font-medium mb-3 sm:mb-4 animate-fade-in-up">
               {subtitle}
             </p>
             
             {/* Title */}
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in-up animation-delay-200">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight animate-fade-in-up animation-delay-200">
               {title}
             </h1>
             
             {/* Description */}
-            <p className="text-base md:text-lg lg:text-xl text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animation-delay-400">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 mb-6 sm:mb-8 max-w-xl sm:max-w-2xl mx-auto leading-relaxed animate-fade-in-up animation-delay-400">
               {description}
             </p>
             
@@ -58,12 +58,12 @@ export function HotelHero({
             <div className="animate-fade-in-up animation-delay-600">
               <Button
                 size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                 onClick={onCtaClick}
               >
                 {ctaText}
                 <svg
-                  className="ml-2 h-5 w-5"
+                  className="ml-2 h-4 sm:h-5 w-4 sm:w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -82,9 +82,9 @@ export function HotelHero({
       </div>
       
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse" />
+      <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
+        <div className="w-5 sm:w-6 h-8 sm:h-10 border-2 border-white/50 rounded-full flex justify-center">
+          <div className="w-0.5 sm:w-1 h-2 sm:h-3 bg-white/70 rounded-full mt-1 sm:mt-2 animate-pulse" />
         </div>
       </div>
       
