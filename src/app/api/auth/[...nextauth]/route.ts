@@ -16,6 +16,7 @@ interface User {
   role: string;
   employeeId?: string;
   language: 'en' | 'ar';
+  password: string;
 }
 
 const users: User[] = [
@@ -26,6 +27,7 @@ const users: User[] = [
     lastName: 'Admin',
     role: 'super_admin',
     language: 'en',
+    password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
   },
   {
     id: '2',
@@ -34,6 +36,7 @@ const users: User[] = [
     lastName: 'Manager',
     role: 'hr_manager',
     language: 'en',
+    password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
   },
 ];
 
@@ -54,7 +57,7 @@ const handler = NextAuth({
             throw new Error('Invalid email or password');
           }
 
-          const isValidPassword = await compare(password, '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+          const isValidPassword = await compare(password, user.password);
           if (!isValidPassword) {
             throw new Error('Invalid email or password');
           }
