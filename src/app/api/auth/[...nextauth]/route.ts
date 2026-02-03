@@ -40,6 +40,12 @@ const users: User[] = [
   },
 ];
 
+const passwordResetTokens = new Map<string, {
+  token: string;
+  expiresAt: Date;
+  used: boolean;
+}>();
+
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
@@ -114,3 +120,37 @@ const handler = NextAuth({
 });
 
 export { handler as GET, handler as POST };
+
+export async function requestPasswordReset(email: string): Promise<boolean> {
+  const user = users.find(u => u.email === email);
+  if (!user) {
+    return false;
+  }
+
+  const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+  passwordResetTokens.set(user.id, {
+    token,
+    expiresAt,
+    used: false,
+  });
+
+  return true;
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<boolean> {
+  for (const [userId, resetData] of passwordResetTokens.entries()) {
+    if (resetData.token === token && !resetData.used && resetData.expiresAt > new Date()) {
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        user.password = await hash(newPassword, 10);
+        resetData.used = true;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+import { hash } from 'bcryptjs';
